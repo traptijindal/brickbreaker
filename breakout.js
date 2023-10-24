@@ -34,6 +34,25 @@ let ball = {
 
 }
 
+//blocks
+let blockArray =[];
+let blockWidth =50;
+let blockHeight =10;
+let blockColumns =8;
+let blockRows = 3; // add more as game goes on
+let blockMaxRows =10; //limit how many rows
+let blockCount =0;
+
+
+//starting block corner top left
+let blockX =15;
+let blockY =45;
+
+
+
+
+
+
 window.onload=function(){
     board =document.getElementById("board");
     board.height=boardHeight;
@@ -46,6 +65,10 @@ window.onload=function(){
 
     requestAnimationFrame(update); //gameloop
     document.addEventListener("keydown",movePlayer);
+
+
+    //create blocks
+    createBlocks();
 
 }
 
@@ -75,7 +98,21 @@ function update(){
         //if ball touches bottom of canvas
         //game over
     }
+    //bounce theball off player paddle
+    if(topCollision(ball,player) || bottomCollision(ball,player)){
+        ball.velocityY*=-1;  //flip y direction up or down
+    }
+    else if (leftCollision(ball,player)|| rightCollision(ball,player)){
+        ball.velocityX *= -1;
+    }
 
+    //blocks
+    context.fillStyle = "skyblue";
+    for(let i=0;i<blockArray.length ; i++){
+        let block = blockArray[i];
+        if(!block.break)
+    context.fillRect(block.x , block.y , block.width , block.height );
+    }
 }
 
 function outOfBound(xPosition){
@@ -109,4 +146,32 @@ function  detectCollision(a,b){
 
 function topCollision(ball,block){
     return detectCollision(ball,block)&&(ball.y + ball.height) >= block.y;
+}
+function bottomCollision(ball,block){ //a is below b (ball is below block)
+    return detectCollision(ball,block) && (block.y + block.height)>= ball.y;
+}
+
+function leftCollision(ball,block){
+    return detectCollision(ball,block)&&(ball.x +ball.width)>=block.x;
+}
+
+function rightCollision(ball,block){ // a is right of b (ball is right of block)
+    return detectCollision(ball,block)&&(block.x + block.width)>=ball.x;
+}
+
+function createBlocks(){
+ blockArray =[]; //clear blockarray
+ for(let c=0 ; c<blockColumns ; c++){
+    for(let r =0 ; r<blockRows;r++){
+        let block ={
+            x : blockX + c*blockWidth +c*10, //c*10 space 10 pixels apart column
+            y : blockY + r*blockHeight + r*10,  //r*10 space 10pixels apart rows
+            width : blockWidth,
+            height : blockHeight,
+            break : false
+        }
+        blockArray.push(block);
+    }
+ }
+ blockCount =blockArray.length;
 }
